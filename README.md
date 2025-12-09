@@ -1,1 +1,0 @@
-# aotr-calc
