@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upgrade Cost Calculator</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .main-container {
+        display: flex;
+        gap: 20px;
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+        align-items: flex-start;
+        justify-content: center;
+      }
+
+      .grades-section {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 30px;
+        width: 300px;
+        flex-shrink: 0;
+      }
+
+      .grades-title {
+        color: #333;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .grade-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .grade-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .main-grade-btn {
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        text-align: center;
+        position: relative;
+      }
+
+      .main-grade-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .main-grade-btn:active {
+        transform: translateY(0);
+      }
+
+      .main-grade-btn.active {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+      }
+
+      .sub-grade-buttons {
+        display: none;
+        flex-direction: column;
+        gap: 6px;
+        margin-left: 15px;
+        margin-top: 5px;
+        animation: slideDown 0.3s ease;
+      }
+
+      .sub-grade-buttons.show {
+        display: flex;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .sub-grade-btn {
+        padding: 10px 15px;
+        background: #f0f0f0;
+        color: #333;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+      }
+
+      .sub-grade-btn:hover {
+        background: #e0e0e0;
+        border-color: #667eea;
+        transform: translateX(5px);
+      }
+
+      .sub-grade-btn:active {
+        transform: translateX(0);
+      }
+
+      .calculator-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 40px;
+        flex: 1;
+        max-width: 500px;
+      }
+
+      .raid-calculator-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 40px;
+        width: 300px;
+        flex-shrink: 0;
+      }
+
+      h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 28px;
+      }
+
+      h2 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 24px;
+      }
+
+      .input-group {
+        margin-bottom: 25px;
+      }
+
+      label {
+        display: block;
+        color: #555;
+        margin-bottom: 8px;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .calculate-btn {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        margin-top: 10px;
+      }
+
+      .calculate-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      .calculate-btn:active {
+        transform: translateY(0);
+      }
+
+      .result-container {
+        margin-top: 30px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        text-align: center;
+        display: none;
+      }
+
+      .result-container.show {
+        display: block;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .result-label {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+
+      .result-value {
+        color: #667eea;
+        font-size: 32px;
+        font-weight: 700;
+      }
+
+      .formula {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #e0e0e0;
+        color: #888;
+        font-size: 12px;
+        font-style: italic;
+      }
+
+      .raid-result-container {
+        margin-top: 30px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        text-align: center;
+        display: none;
+      }
+
+      .raid-result-container.show {
+        display: block;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .raid-result-value {
+        color: #764ba2;
+        font-size: 32px;
+        font-weight: 700;
+      }
+
+      @media (max-width: 1200px) {
+        .main-container {
+          flex-wrap: wrap;
+        }
+
+        .raid-calculator-container {
+          width: 100%;
+          max-width: 500px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .main-container {
+          flex-direction: column;
+        }
+
+        .grades-section {
+          width: 100%;
+        }
+
+        .calculator-container {
+          max-width: 100%;
+        }
+
+        .raid-calculator-container {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-container">
+      <div class="grades-section">
+        <h2 class="grades-title">Grades</h2>
+        <div class="grade-buttons">
+          <div class="grade-group">
+            <button class="main-grade-btn" onclick="toggleSubGrades('A')">
+              A Grade
+            </button>
+            <div class="sub-grade-buttons" id="A-sub">
+              <button class="sub-grade-btn" onclick="selectGrade('A+ Grade')">
+                A+ Grade
+              </button>
+              <button class="sub-grade-btn" onclick="selectGrade('A Grade')">
+                A Grade
+              </button>
+              <button class="sub-grade-btn" onclick="selectGrade('A- Grade')">
+                A- Grade
+              </button>
+            </div>
+          </div>
+
+          <div class="grade-group">
+            <button class="main-grade-btn" onclick="toggleSubGrades('B')">
+              B Grade
+            </button>
+            <div class="sub-grade-buttons" id="B-sub">
+              <button class="sub-grade-btn" onclick="selectGrade('B+ Grade')">
+                B+ Grade
+              </button>
+              <button class="sub-grade-btn" onclick="selectGrade('B Grade')">
+                B Grade
+              </button>
+              <button class="sub-grade-btn" onclick="selectGrade('B- Grade')">
+                B- Grade
+              </button>
+            </div>
+          </div>
+
+          <div class="grade-group">
+            <button class="main-grade-btn" onclick="toggleSubGrades('C')">
+              C Grade
+            </button>
+            <div class="sub-grade-buttons" id="C-sub">
+              <button class="sub-grade-btn" onclick="selectGrade('C+ Grade')">
+                C+ Grade
+              </button>
+              <button class="sub-grade-btn" onclick="selectGrade('C Grade')">
+                C Grade
+              </button>
+              <button class="sub-grade-btn" onclick="selectGrade('C- Grade')">
+                C- Grade
+              </button>
+            </div>
+          </div>
+
+          <div class="grade-group">
+            <button class="main-grade-btn" onclick="toggleSubGrades('D')">
+              D Grade
+            </button>
+            <div class="sub-grade-buttons" id="D-sub">
+              <button class="sub-grade-btn" onclick="selectGrade('D+ Grade')">
+                D+ Grade
+              </button>
+              <button class="sub-grade-btn" onclick="selectGrade('D Grade')">
+                D Grade
+              </button>
+              <button class="sub-grade-btn" onclick="selectGrade('D- Grade')">
+                D- Grade
+              </button>
+            </div>
+          </div>
+
+          <div class="grade-group">
+            <button class="main-grade-btn" onclick="toggleSubGrades('E')">
+              E Grade
+            </button>
+            <div class="sub-grade-buttons" id="E-sub">
+              <button class="sub-grade-btn" onclick="selectGrade('E+ Grade')">
+                E+ Grade
+              </button>
+              <button class="sub-grade-btn" onclick="selectGrade('E Grade')">
+                E Grade
+              </button>
+              <button class="sub-grade-btn" onclick="selectGrade('E- Grade')">
+                E- Grade
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="calculator-container">
+        <h1>Upgrade Cost Calculator</h1>
+
+        <div class="input-group">
+          <label for="upgrade-cost">Cost of 1 Upgrade</label>
+          <input
+            type="number"
+            id="upgrade-cost"
+            placeholder="Enter cost per upgrade"
+            min="0"
+            step="0.01"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="completed-upgrades">Completed Upgrades</label>
+          <input
+            type="number"
+            id="completed-upgrades"
+            placeholder="Enter number of completed upgrades"
+            min="0"
+            max="8"
+            step="1"
+          />
+        </div>
+
+        <button class="calculate-btn" onclick="calculate()">
+          Calculate Total Cost
+        </button>
+
+        <div class="result-container" id="result">
+          <div class="result-label">Total Cost Remaining</div>
+          <div class="result-value" id="result-value">$0.00</div>
+          <div class="formula" id="formula"></div>
+        </div>
+      </div>
+
+      <div class="raid-calculator-container">
+        <h2>Raid Calculator</h2>
+
+        <div class="input-group">
+          <label for="raid-money">Money per Raid</label>
+          <input
+            type="number"
+            id="raid-money"
+            placeholder="Enter money per raid"
+            min="0"
+            step="0.01"
+            oninput="roundToSignificant(this)"
+          />
+        </div>
+
+        <button class="calculate-btn" onclick="calculateRaids()">
+          Calculate Raids Needed
+        </button>
+
+        <div class="raid-result-container" id="raid-result">
+          <div class="result-label">Raids Needed</div>
+          <div class="raid-result-value" id="raid-result-value">0</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let totalCostRemaining = 0;
+
+      function roundToSignificant(input) {
+        const value = parseFloat(input.value);
+        if (isNaN(value) || value === 0) return;
+
+        // Round to 2 significant figures
+        const magnitude = Math.floor(Math.log10(Math.abs(value)));
+        const factor = Math.pow(10, 1 - magnitude);
+        const rounded = Math.round(value * factor) / factor;
+
+        input.value = rounded;
+      }
+
+      function toggleSubGrades(grade) {
+        const subButtons = document.getElementById(grade + "-sub");
+        const mainButton = event.target;
+        const allSubButtons = document.querySelectorAll(".sub-grade-buttons");
+        const allMainButtons = document.querySelectorAll(".main-grade-btn");
+
+        // Close all other sub-menus
+        allSubButtons.forEach((sub) => {
+          if (sub !== subButtons) {
+            sub.classList.remove("show");
+          }
+        });
+
+        // Remove active state from all main buttons
+        allMainButtons.forEach((btn) => {
+          if (btn !== mainButton) {
+            btn.classList.remove("active");
+          }
+        });
+
+        // Toggle current sub-menu
+        subButtons.classList.toggle("show");
+        mainButton.classList.toggle("active");
+      }
+
+      // Grade to cost mapping
+      const gradeCosts = {
+        "A+ Grade": 169520,
+        "A Grade": 135000,
+        "A- Grade": 100000,
+        "B+ Grade": 70000,
+        "B Grade": 50000,
+        "B- Grade": 37500,
+        "C+ Grade": 25000,
+        "C Grade": 17500,
+        "C- Grade": 11000,
+        "D+ Grade": 7500,
+        "D Grade": 5000,
+        "D- Grade": 3000,
+        "E+ Grade": 2000,
+        "E Grade": 1250,
+        "E- Grade": 500,
+      };
+
+      function selectGrade(gradeName) {
+        // Set the cost based on the selected grade
+        const cost = gradeCosts[gradeName];
+        if (cost !== undefined) {
+          document.getElementById("upgrade-cost").value = cost;
+          // Close the sub-menu after selection
+          const allSubButtons = document.querySelectorAll(".sub-grade-buttons");
+          const allMainButtons = document.querySelectorAll(".main-grade-btn");
+          allSubButtons.forEach((sub) => sub.classList.remove("show"));
+          allMainButtons.forEach((btn) => btn.classList.remove("active"));
+        }
+      }
+
+      function calculate() {
+        const costPerUpgrade = parseFloat(
+          document.getElementById("upgrade-cost").value
+        );
+        const completedUpgrades = parseInt(
+          document.getElementById("completed-upgrades").value
+        );
+
+        // Validate inputs
+        if (isNaN(costPerUpgrade) || costPerUpgrade < 0) {
+          alert("Please enter a valid cost per upgrade");
+          return;
+        }
+
+        if (
+          isNaN(completedUpgrades) ||
+          completedUpgrades < 0 ||
+          completedUpgrades > 8
+        ) {
+          alert("Please enter a valid number of completed upgrades (0-8)");
+          return;
+        }
+
+        // Calculate: (8 - completed upgrades) * cost of 1 upgrade
+        const remainingUpgrades = 8 - completedUpgrades;
+        totalCostRemaining = remainingUpgrades * costPerUpgrade;
+
+        // Display result
+        const resultContainer = document.getElementById("result");
+        const resultValue = document.getElementById("result-value");
+        const formula = document.getElementById("formula");
+
+        resultValue.textContent = "$" + totalCostRemaining.toFixed(2);
+        formula.textContent = `Formula: (8 - ${completedUpgrades}) × $${costPerUpgrade.toFixed(
+          2
+        )} = ${remainingUpgrades} × $${costPerUpgrade.toFixed(
+          2
+        )} = $${totalCostRemaining.toFixed(2)}`;
+
+        resultContainer.classList.add("show");
+
+        // Auto-calculate raids if raid money is already entered
+        const raidMoney = parseFloat(
+          document.getElementById("raid-money").value
+        );
+        if (!isNaN(raidMoney) && raidMoney > 0 && totalCostRemaining > 0) {
+          calculateRaids();
+        }
+      }
+
+      function calculateRaids() {
+        const raidMoney = parseFloat(
+          document.getElementById("raid-money").value
+        );
+
+        // Validate input
+        if (isNaN(raidMoney) || raidMoney <= 0) {
+          alert("Please enter a valid amount of money per raid");
+          return;
+        }
+
+        if (totalCostRemaining <= 0) {
+          alert("Please calculate the total cost remaining first");
+          return;
+        }
+
+        // Calculate: total cost remaining / raid money
+        const raidsNeeded = Math.ceil(totalCostRemaining / raidMoney);
+
+        // Display result
+        const raidResultContainer = document.getElementById("raid-result");
+        const raidResultValue = document.getElementById("raid-result-value");
+
+        raidResultValue.textContent = raidsNeeded;
+        raidResultContainer.classList.add("show");
+      }
+
+      // Allow Enter key to trigger calculation
+      document.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+          const activeElement = document.activeElement;
+          if (
+            activeElement.id === "upgrade-cost" ||
+            activeElement.id === "completed-upgrades"
+          ) {
+            calculate();
+          } else if (activeElement.id === "raid-money") {
+            calculateRaids();
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
